@@ -1,4 +1,5 @@
 import path from "path";
+import { fileURLToPath } from "url";
 //Importo express
 import db from './config/db.js';
 import express from 'express';
@@ -41,7 +42,9 @@ app.use('/usuarios', verificarToken ,usuariosRouter);
 app.use('/pedidos', verificarToken ,pedidosRouter);
 app.use('/tickets', verificarToken ,ticketsRouter);
 // Servir la carpeta "docs" como estática
-app.use("/docs", express.static("./docs"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/docs", express.static(path.join(__dirname, "docs")));
 
 
 app.listen(port, () => {
