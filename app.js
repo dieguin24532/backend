@@ -42,7 +42,7 @@ app.use('/eventos', verificarToken ,eventosRouter);
 app.use('/usuarios', verificarToken ,usuariosRouter);
 app.use('/pedidos', verificarToken ,pedidosRouter);
 app.use('/tickets', verificarToken ,ticketsRouter);
-app.use("/docs", express.static(path.join(process.cwd(), "docs")));
+app.use("/docs", express.static(path.join(process.cwd(), "backend", "docs")));
 
 app.listen(port, () => {
     console.log(`Programa escuchando en el puerto ${port}`);
