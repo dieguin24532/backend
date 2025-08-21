@@ -15,7 +15,6 @@ import { verificarToken } from './middleware/auth.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-
 //Instancio en la variable app el middleware de express
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,7 +28,7 @@ app.use(cors());
 try {
   await db.authenticate();
   await db.sync();
-  console.log('conexión con la base de datos exitosa');
+  console.log('Conexión con la base de datos exitosa');
 } catch (error) {
   console.log('Error al conectarse con la base de datos:' + error);
 }
@@ -37,16 +36,27 @@ try {
 //Routing
 app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
-app.use('/eventos', verificarToken ,eventosRouter);
-app.use('/usuarios', verificarToken ,usuariosRouter);
-app.use('/pedidos', verificarToken ,pedidosRouter);
-app.use('/tickets', verificarToken ,ticketsRouter);
+app.use('/eventos', verificarToken, eventosRouter);
+app.use('/usuarios', verificarToken, usuariosRouter);
+app.use('/pedidos', verificarToken, pedidosRouter);
+app.use('/tickets', verificarToken, ticketsRouter);
+
 // Servir la carpeta "docs" como estática
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Solución para Render: usar rutas absolutas y verificar la carpeta
 app.use("/docs", express.static(path.join(__dirname, "docs")));
 
+// Middleware para capturar errores de rutas no encontradas
+app.use((req, res, next) => {
+  if (req.url.startsWith("/docs")) {
+    console.error(`No se encontró el archivo solicitado: ${req.url}`);
+  }
+  next();
+});
 
+// Iniciar el servidor
 app.listen(port, () => {
-    console.log(`Programa escuchando en el puerto ${port}`);
-})
+  console.log(`Programa escuchando en el puerto ${port}`);
+});
