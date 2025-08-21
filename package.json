@@ -1,0 +1,32 @@
+{
+  "name": "ticketera",
+  "version": "1.0.0",
+  "description": "Proyecto que sonsume el webhook de Wordpress para gestionar los tickets de gala academy",
+  "keywords": [
+    "Wodrpress",
+    "Webhook",
+    "Ticketera"
+  ],
+  "license": "ISC",
+  "author": "Diego Galindo",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --env-file=.env app.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.3",
+    "nodemon": "^3.1.10",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
+    "sequelize": "^6.37.7",
+    "uuid": "^11.1.0"
+  }
+}
