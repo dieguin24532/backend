@@ -8,7 +8,7 @@ const generarEntradaPDF = async (ticketId) => {
 
         // Descargar el PDF usando fetch global de Node 18+
         const respuesta = await fetch(pdfUrl);
-        if (!respuesta.ok) throw new Error("No se pudo descargar el PDF desde la URL "+ error);
+        if (!respuesta.ok) throw new Error("No se pudo descargar el PDF desde la URL ");
 
         const pdfArrayBuffer = await respuesta.arrayBuffer();
 
