@@ -1,25 +1,30 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { ticketService } from '../serviceLayer/ticketsService.js';
-
-// Necesario para obtener __dirname con ESModules
+import { PDFDocument, StandardFonts } from "pdf-lib";
+import { ticketService } from "../serviceLayer/ticketsService.js";
 
 const generarEntradaPDF = async (ticketId) => {
     try {
-        const pdfPath = path.join(process.cwd(), "docs", "TICKET_EXMA.PDF");
-        const pdfBase = fs.readFileSync(pdfPath);
-        const pdfDoc = await PDFDocument.load(pdfBase);
+        // URL pública del PDF servido en Render
+        const pdfUrl = "http://localhost:3000/docs/TICKET_EXMA.PDF";
+
+        // Descargar el PDF usando fetch global de Node 18+
+        const respuesta = await fetch(pdfUrl);
+        if (!respuesta.ok) throw new Error("No se pudo descargar el PDF desde la URL");
+
+        const pdfArrayBuffer = await respuesta.arrayBuffer();
+
+        // Cargar el PDF
+        const pdfDoc = await PDFDocument.load(pdfArrayBuffer);
 
         const paginas = pdfDoc.getPages();
         const primeraPagina = paginas[0];
-        let ticket = await ticketService.obtenerTicketById(ticketId);
 
-        // Cargar fuente por defecto (Helvetica)
+        // Obtener ticket desde servicio
+        const ticket = await ticketService.obtenerTicketById(ticketId);
+
+        // Fuente por defecto
         const fuente = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-
+        // Procesar imagen QR
         const imagenBase64Compuesta = ticket.codigo_qr;
         const imagenBase64 = imagenBase64Compuesta.split(",")[1];
         const imagenBinaria = base64Bytes(imagenBase64);
@@ -33,34 +38,34 @@ const generarEntradaPDF = async (ticketId) => {
             height: DimensionesImagen.height
         });
 
+        // Texto Butaca
         const textoEtiqueta = fuente.widthOfTextAtSize(`Butaca: ${ticket.etiqueta}`, 20);
+        primeraPagina.drawText(`Butaca: ${ticket.etiqueta}`, {
+            x: (primeraPagina.getWidth() - textoEtiqueta) / 2,
+            y: primeraPagina.getHeight() / 2 - 140,
+            size: 20
+        });
 
-        primeraPagina.drawText(
-            `Butaca: ${ticket.etiqueta}`,
-            {
-                x: (primeraPagina.getWidth() - textoEtiqueta) / 2,
-                y: primeraPagina.getHeight() / 2 - 140,
-                size: 20
-            });
-
-
-        const textoLocalidad = fuente.widthOfTextAtSize(`Localidad: ${ticket.localidad}`, 20)
-        primeraPagina.drawText(
-            `Localidad: ${ticket.localidad}`,
-            {
-                x: (primeraPagina.getWidth() - textoLocalidad) / 2,
-                y: primeraPagina.getHeight() / 2 - 170,
-                size: 20
-            });
-
+        // Texto Localidad
+        const textoLocalidad = fuente.widthOfTextAtSize(`Localidad: ${ticket.localidad}`, 20);
+        primeraPagina.drawText(`Localidad: ${ticket.localidad}`, {
+            x: (primeraPagina.getWidth() - textoLocalidad) / 2,
+            y: primeraPagina.getHeight() / 2 - 170,
+            size: 20
+        });
 
         const PDF = await pdfDoc.save();
-        return {PDF, ticket};
+        return { PDF, ticket };
 
     } catch (error) {
         console.log(error);
+        throw error;
     }
-}
+};
+
+export default generarEntradaPDF;
+
+
 
 
 const base64Bytes = (cadenaBase64) => {

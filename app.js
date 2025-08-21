@@ -1,3 +1,5 @@
+import path from "path";
+const __dirname = path.resolve();
 //Importo express
 import db from './config/db.js';
 import express from 'express';
@@ -33,6 +35,7 @@ try {
 }
 
 //Routing
+app.use("/docs", express.static(path.join(__dirname, "docs")));
 app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
 app.use('/eventos', verificarToken ,eventosRouter);
