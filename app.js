@@ -35,13 +35,13 @@ try {
 }
 
 //Routing
-app.use("/docs", express.static(path.join(__dirname, "docs")));
 app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
 app.use('/eventos', verificarToken ,eventosRouter);
 app.use('/usuarios', verificarToken ,usuariosRouter);
 app.use('/pedidos', verificarToken ,pedidosRouter);
 app.use('/tickets', verificarToken ,ticketsRouter);
+app.use("/docs", express.static(path.join(__dirname, "docs")));
 
 app.listen(port, () => {
     console.log(`Programa escuchando en el puerto ${port}`);
