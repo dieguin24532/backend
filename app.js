@@ -1,5 +1,4 @@
 import path from "path";
-const __dirname = path.resolve();
 //Importo express
 import db from './config/db.js';
 import express from 'express';
@@ -24,7 +23,6 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
-app.use(express.static('docs'))
 
 //Sincronizar la base de datos
 try {
@@ -42,7 +40,9 @@ app.use('/eventos', verificarToken ,eventosRouter);
 app.use('/usuarios', verificarToken ,usuariosRouter);
 app.use('/pedidos', verificarToken ,pedidosRouter);
 app.use('/tickets', verificarToken ,ticketsRouter);
-app.use("/docs", express.static(path.join(process.cwd(), "backend", "docs")));
+// Servir la carpeta "docs" como estática
+app.use("/docs", express.static("./docs"));
+
 
 app.listen(port, () => {
     console.log(`Programa escuchando en el puerto ${port}`);
