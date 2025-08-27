@@ -10,6 +10,7 @@ import ordenRouter from './routes/ordenRouter.js';
 import eventosRouter from './routes/eventosRouter.js';
 import authRouter from './routes/authRouter.js';
 import usuariosRouter from './routes/usuariosRouter.js';
+import sendgridRouter from './routes/sendgridRouter.js';
 //Middleware
 import { verificarToken } from './middleware/auth.js';
 import cookieParser from 'cookie-parser';
@@ -22,12 +23,17 @@ const port = process.env.PORT || 3000;
 //Habilitar recibir peticiones HTTP con body
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4200', // Dominio del frontend
+  credentials: true,              // Permitir envío de cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'],   // Cabeceras permitidas
+}));
 
 //Sincronizar la base de datos
 try {
   await db.authenticate();
-  await db.sync();
+  await db.sync({ });
   console.log('Conexión con la base de datos exitosa');
 } catch (error) {
   console.log('Error al conectarse con la base de datos:' + error);
@@ -36,6 +42,7 @@ try {
 //Routing
 app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
+app.use('/sendgrid', sendgridRouter);
 app.use('/eventos', verificarToken, eventosRouter);
 app.use('/usuarios', verificarToken, usuariosRouter);
 app.use('/pedidos', verificarToken, pedidosRouter);
@@ -47,14 +54,6 @@ const __dirname = path.dirname(__filename);
 
 // Solución para Render: usar rutas absolutas y verificar la carpeta
 app.use("/docs", express.static(path.join(__dirname, "docs")));
-
-// Middleware para capturar errores de rutas no encontradas
-app.use((req, res, next) => {
-  if (req.url.startsWith("/docs")) {
-    console.error(`No se encontró el archivo solicitado: ${req.url}`);
-  }
-  next();
-});
 
 // Iniciar el servidor
 app.listen(port, () => {

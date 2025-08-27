@@ -67,14 +67,14 @@ async function actualizarEmail(req, res) {
   try {
     const pedido = req.body;
     
-    const insertado = await Pedidos.update(
+    const [ updatedRows] = await Pedidos.update(
       { email: pedido.email },
       {
         where: { id: pedido.id }
       }
     );
 
-    res.status(200).json(ApiResponse.getResponse(200, 'Actualizado correctamente', insertado))
+    res.status(200).json(ApiResponse.getResponse(200, 'Actualizado correctamente', updatedRows))
   } catch (error) {
     console.log(error);
   }

@@ -1,11 +1,11 @@
-import { isColString } from "sequelize/lib/utils";
 import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 import { eventoService } from "../serviceLayer/eventosService.js";
 import { eventoDTO } from "../dtos/eventoDTO.js";
 
 async function obtenerEventos(req, res) {
     try {
-        const eventos = await eventoService.obtenerEventos();
+        // const eventos = await eventoService.obtenerEventos();
+        const eventos = await eventoService.obtenerTicketsPorEventoYLocalidad();
 
         if (eventos.length === 0) {
             return res

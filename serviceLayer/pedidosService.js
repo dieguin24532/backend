@@ -1,4 +1,5 @@
-import { Pedidos } from "../models/db/index.js";
+import { Sequelize } from "sequelize";
+import { Pedidos, Tickets } from "../models/db/index.js";
 
 export class pedidoService {
 
@@ -27,7 +28,30 @@ export class pedidoService {
   }
 
   static async obtenerPedidos() {
-    return await Pedidos.findAll();
+    return await Pedidos.findAll({
+      attributes: [
+        "id",
+        "cliente",
+        "email",
+        "telefono",
+        "ruc_cedula",
+        "total",
+        "impuesto",
+        "descuento",
+        "metodo_pago",
+        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"]
+      ],
+      include: [
+        {
+          model: Tickets,
+          as: "tickets",
+          attributes: [],
+          required: false
+        }
+      ],
+      group: ["pedidos.id"],
+      raw: true
+    });
   }
 
   static async eliminarPedido(pedido) {

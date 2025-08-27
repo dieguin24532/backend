@@ -1,7 +1,8 @@
+import { raw } from "mysql2";
 import { Eventos, Pedidos, Tickets } from "../models/db/index.js";
 import PostsMeta from "../models/db_wordpress/Post-meta.js";
 import Posts from "../models/db_wordpress/Posts.js";
-import { Op } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 
 export class ticketService {
   static async crearTicket(ticket, transaction) {
@@ -30,12 +31,39 @@ export class ticketService {
         model: Eventos,
         as: 'evento',
         required: true
-      }]
+      }],
+      raw: false
     });
   }
 
   static async obtenerTickets() {
-    return await Tickets.findAll();
+    return await Tickets.findAll({
+      attributes: [
+        "id",
+        "evento_id",
+        "pedido_id",
+        "etiqueta",
+        "localidad",
+        "correo_enviado",
+        "escaneado_por",
+        [ Sequelize.col("evento.nombre_evento"), "nombre_evento"],
+        [ Sequelize.col("pedido.cliente"), "cliente"]
+      ], 
+      include: [
+        {
+          model:Eventos,
+          as: "evento",
+          attributes: []
+        },
+        {
+          model:Pedidos,
+          as: "pedido",
+          attributes: []
+        }
+      ],
+      raw: true
+    }
+    );
   }
 
   static async obtenerTicketDetalleById(ticketId) {

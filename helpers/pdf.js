@@ -25,6 +25,11 @@ const generarEntradaPDF = async (ticketId) => {
         const fuente = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
         // Procesar imagen QR
+        
+        if(!ticket) {
+            throw new Error("Error no existe el ticket");
+        }
+
         const imagenBase64Compuesta = ticket.codigo_qr;
         const imagenBase64 = imagenBase64Compuesta.split(",")[1];
         const imagenBinaria = base64Bytes(imagenBase64);
@@ -55,7 +60,7 @@ const generarEntradaPDF = async (ticketId) => {
         });
 
         const PDF = await pdfDoc.save();
-        return { PDF, ticket };
+        return PDF;
 
     } catch (error) {
         console.log(error);

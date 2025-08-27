@@ -29,7 +29,7 @@ export class eventoService {
         "fecha_fin",
         "createdAt",
         "updatedAt",
-        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"]
+        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"],
       ],
       include: [
         {
@@ -40,7 +40,66 @@ export class eventoService {
         },
       ],
       group: ["eventos.id"],
-      raw: true, // ✅ esto entrega objetos planos con el campo "tickets"
+      raw: true,
+    });
+  }
+
+  static async obtenerTicketsPorEventoYLocalidad() {
+    // Primero agregamos tickets por evento y localidad
+    const ticketsAgrupados = await Tickets.findAll({
+      attributes: [
+        "evento_id",
+        "localidad",
+        [Sequelize.fn("COUNT", Sequelize.col("id")), "cantidad"],
+      ],
+      group: ["evento_id", "localidad"],
+    });
+
+    // Creamos un objeto intermedio para mapear tickets por evento
+    const ticketsPorEvento = {};
+    ticketsAgrupados.forEach((ticket) => {
+      const { evento_id, localidad, cantidad } = ticket.toJSON();
+      if (!ticketsPorEvento[evento_id]) ticketsPorEvento[evento_id] = {};
+      ticketsPorEvento[evento_id][localidad] = parseInt(cantidad);
+    });
+
+    console.log(ticketsPorEvento)
+
+    // Obtenemos todos los eventos
+    const eventos = await Eventos.findAll({
+      attributes: [
+        "id",
+        "lugar",
+        "nombre_evento",
+        "fecha_inicio",
+        "fecha_fin",
+        "createdAt",
+        "updatedAt",
+        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"],
+      ],
+      include: [
+        {
+          model: Tickets,
+          as: "tickets",
+          attributes: [],
+          required: false,
+        },
+      ],
+      group: ["eventos.id"],
+      raw: true
+    });
+
+    // Mapear tickets agregados a cada evento
+    return eventos.map((evento) => {
+      return {
+        id: evento.id,
+        nombre_evento: evento.nombre_evento,
+        lugar: evento.lugar,
+        fecha_inicio : evento.fecha_inicio,
+        fecha_fin : evento.fecha_fin,
+        tickets_totales: evento.tickets_totales,
+        tickets_localidad: ticketsPorEvento[evento.id] || {},
+      };
     });
   }
 

@@ -10,7 +10,6 @@ const Pedidos = db.define('pedidos', {
     email: DataTypes.STRING,
     telefono: DataTypes.STRING,
     ruc_cedula: DataTypes.STRING,
-    cantidad: DataTypes.INTEGER,
     total: DataTypes.DECIMAL(10,2),
     impuesto: DataTypes.DECIMAL(10,2),
     descuento: DataTypes.DECIMAL(10,2),

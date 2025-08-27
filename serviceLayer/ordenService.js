@@ -3,6 +3,8 @@ import { ticketService } from "./ticketsService.js";
 import { pedidoService } from "./pedidosService.js";
 import db from "../config/db.js";
 import { generarCodigoQR } from "../helpers/codigosQr.js";
+import generarEntradaPDF from "../helpers/pdf.js";
+import { enviarEmail } from "../helpers/emails.js";
 
 export class ordenService {
   static async generarOrden(pedido) {
@@ -14,8 +16,7 @@ export class ordenService {
     try {
       await pedidoService.eliminarPedido(pedido);
     } catch (error) {
-      throw (error);
-      
+      throw error;
     }
   }
 
@@ -40,10 +41,10 @@ export class ordenService {
       );
 
       // Inserta los tickets del pedido
-      for (let ticket of orden.tickets) {
-        let nuevoTicket = await ticketService.crearTicket(ticket, t);
-        const codigoQr = await generarCodigoQR(nuevoTicket.id)
-        await nuevoTicket.update({ codigo_qr: codigoQr }, { transaction: t });
+      for (let element of orden.tickets) {
+        let ticketCreado = await ticketService.crearTicket(element, t);
+        const codigoQr = await generarCodigoQR(ticketCreado.id);
+        ticketCreado = await ticketCreado.update({ codigo_qr: codigoQr }, { transaction: t });
       }
 
       await t.commit();
@@ -100,7 +101,7 @@ export class ordenService {
         };
       })
     );
-    
+
     return {
       pedido: pedido,
       tickets: ticketsConDetalle,
