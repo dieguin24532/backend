@@ -43,7 +43,7 @@ const login = async (req, res) => {
           httpOnly: true,
           //Cambiar en produccion
           secure: process.env.SECURE,
-          samesite: "None",
+          sameSite: "None",
           maxAge: 1000 * 60 * 60,
         })
         .status(200)
