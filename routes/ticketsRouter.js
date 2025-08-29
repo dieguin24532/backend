@@ -1,6 +1,6 @@
 import express from 'express';
 import { enviarEntrada, obtenerTicketsByEvento, obtenerTickets, verEntrada } from '../controllers/ticketsController.js';
-import { obtenerLogsByTicketID } from '../controllers/TicketsMailLogsController.js';
+import { obtenerLogsByTicketID } from '../controllers/ticketsMailLogsController.js';
 
 const router = express.Router();
 

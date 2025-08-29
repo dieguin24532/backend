@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import dbTickets from "../../config/db_wordpress.js";
 
-const PostsMeta = dbTickets.define('dqgl_postmeta', {
+const PostsMeta = dbTickets.define('wp_postmeta', {
     meta_id: {
         type: DataTypes.INTEGER,
         primaryKey: true
