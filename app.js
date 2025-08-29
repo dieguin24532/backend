@@ -23,7 +23,7 @@ const port = process.env.PORT || 3000;
 
 //Habilitar recibir peticiones HTTP con body
 app.use(cors({
-  origin: ['http://localhost:4200', 'https://certificados.galaevents.app'], // Dominio del frontend
+  origin: ['http://localhost:4200', 'https://ticket.galaacademy.com'], // Dominio del frontend
   credentials: true,              // Permitir envío de cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'],   // Cabeceras permitidas
