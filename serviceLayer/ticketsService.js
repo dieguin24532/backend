@@ -134,7 +134,7 @@ export class ticketService {
           Sequelize.fn("SUM", Sequelize.col("localidad.precio")),
           "ventas_localidad",
         ],
-        [Sequelize.fn("COUNT", Sequelize.col("Tickets.id")), "tickets_vendidos"]
+        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_vendidos"]
       ],
       include: [
         {
