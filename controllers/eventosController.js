@@ -5,7 +5,7 @@ import { eventoDTO } from "../dtos/eventoDTO.js";
 async function obtenerEventos(req, res) {
     try {
         // const eventos = await eventoService.obtenerEventos();
-        const eventos = await eventoService.obtenerTicketsPorEventoYLocalidad();
+        const eventos = await eventoService.obtenerEventos();
 
         if (eventos.length === 0) {
             return res
@@ -17,7 +17,7 @@ async function obtenerEventos(req, res) {
         );
         res
             .status(200)
-            .json(ApiResponse.getResponse(200, "Eventos obtenidos", eventosFormateados));
+            .json(ApiResponse.getResponse(200, "Eventos obtenidos", eventos));
     } catch (error) {
         console.log(error);
         res

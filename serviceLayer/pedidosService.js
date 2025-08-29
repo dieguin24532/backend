@@ -9,7 +9,6 @@ export class pedidoService {
    * @returns
    */
   static async crearPedido(pedido, transaction ) {
-    console.log(pedido);
     return await Pedidos.create({
       id: pedido.id,
       cliente: `${pedido.first_name} ${pedido.last_name}`,

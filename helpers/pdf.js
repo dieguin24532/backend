@@ -52,8 +52,8 @@ const generarEntradaPDF = async (ticketId) => {
         });
 
         // Texto Localidad
-        const textoLocalidad = fuente.widthOfTextAtSize(`Localidad: ${ticket.localidad}`, 20);
-        primeraPagina.drawText(`Localidad: ${ticket.localidad}`, {
+        const textoLocalidad = fuente.widthOfTextAtSize(`Localidad: ${ticket.localidad_id}`, 20);
+        primeraPagina.drawText(`Localidad: ${ticket.localidad_id}`, {
             x: (primeraPagina.getWidth() - textoLocalidad) / 2,
             y: primeraPagina.getHeight() / 2 - 170,
             size: 20

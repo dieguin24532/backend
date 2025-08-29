@@ -6,9 +6,7 @@ import { generarEntradaPDF } from "../helpers/pdf.js";
 
 async function obtenerTickets(req, res) {
     try {
-        const tickets = await ticketService.obtenerTickets();
-
-        
+        const tickets = await ticketService.obtenerTickets();   
         
         if (tickets.length != 0) {
             const tickets2 = tickets.map(element => {
@@ -23,13 +21,40 @@ async function obtenerTickets(req, res) {
             return;
         }
 
-        res
-            .status(200)
+        res.status(200)
             .json(ApiResponse.getResponse(200, "No existen tickets", tickets));
+            
     } catch (error) {
         console.log(error);
-        res
-            .status(500)
+        res.status(500)
+            .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+    }
+}
+
+async function obtenerTicketsByEvento(req, res) {
+    const ticketId = req.params.id;
+    try {
+        const tickets = await ticketService.obtenerTicketsByEvento(ticketId);
+        
+        if (tickets.length != 0) {
+            const ticketsMapeados = tickets.map(element => {
+                return {
+                    ...element,
+                    correo_enviado: !!element.correo_enviado
+                }
+            });
+            res
+                .status(200)
+                .json(ApiResponse.getResponse(200, "Tickets encontrados", ticketsMapeados));
+            return;
+        }
+
+        res.status(200)
+            .json(ApiResponse.getResponse(200, "No existen tickets", tickets));
+            
+    } catch (error) {
+        console.log(error);
+        res.status(500)
             .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
     }
 }
@@ -72,4 +97,4 @@ async function enviarEntrada(req, res) {
     }
 }
 
-export { obtenerTickets, verEntrada, enviarEntrada };
+export { obtenerTickets, verEntrada, enviarEntrada, obtenerTicketsByEvento };

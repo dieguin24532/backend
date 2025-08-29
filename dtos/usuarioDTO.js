@@ -14,3 +14,10 @@ export function usuarioPublicoDTO(usuario) {
         email: usuario.email
     }
 }
+
+export function usuarioLoginDTO(usuario) {
+    return {
+        nombre: usuario.nombre,
+        email: usuario.email
+    }
+}

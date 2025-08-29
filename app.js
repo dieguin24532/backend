@@ -15,6 +15,7 @@ import sendgridRouter from './routes/sendgridRouter.js';
 import { verificarToken } from './middleware/auth.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import dbTickets from "./config/db_wordpress.js";
 
 //Instancio en la variable app el middleware de express
 const app = express();
@@ -33,7 +34,8 @@ app.use(cors({
 //Sincronizar la base de datos
 try {
   await db.authenticate();
-  await db.sync({ });
+  await dbTickets.authenticate();
+  await db.sync();
   console.log('Conexión con la base de datos exitosa');
 } catch (error) {
   console.log('Error al conectarse con la base de datos:' + error);

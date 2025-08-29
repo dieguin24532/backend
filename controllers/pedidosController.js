@@ -5,6 +5,7 @@ import { pedidoService } from "../serviceLayer/pedidosService.js";
 
 async function recibirActualizaciónPedido(req, res) {
   try {
+    console.log(req.body);
     const data = req.body;
     const ruc_cedula = data.meta_data.find(
       (meta) => meta.key === "_billing_ruc_o_cedula"

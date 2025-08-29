@@ -6,6 +6,5 @@ export function eventoDTO(evento) {
         tickets_totales: evento.tickets_totales,
         fecha_inicio: evento.fecha_inicio,
         fecha_fin: evento.fecha_fin,
-        tickets_localidad: evento.tickets_localidad
     }
 }

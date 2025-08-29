@@ -37,6 +37,7 @@ const login = async (req, res) => {
 
     if (email === usuario.email && matchPassword) {
       const token = crearToken(email);
+      const usuario = await Usuario.findOne({ where: { email: email } })
       return res
         .cookie("token", token, {
           httpOnly: true,
@@ -46,7 +47,7 @@ const login = async (req, res) => {
           maxAge: 1000 * 60 * 60,
         })
         .status(200)
-        .json(ApiResponse.getResponse(200, "Autenticado correctamente", token));
+        .json(ApiResponse.getResponse(200, "Autenticado correctamente", {nombre:usuario.nombre}));
     } else {
       res
         .status(401)

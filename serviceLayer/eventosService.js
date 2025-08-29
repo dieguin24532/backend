@@ -1,7 +1,9 @@
-import { Eventos, Tickets } from "../models/db/index.js";
+import { Eventos, Localidades, Tickets } from "../models/db/index.js";
 import PostsMeta from "../models/db_wordpress/Post-meta.js";
 import Posts from "../models/db_wordpress/Posts.js";
 import { Op, Sequelize } from "sequelize";
+import { ticketService } from "./ticketsService.js";
+import { raw } from "mysql2";
 
 export class eventoService {
   static async obtenerEventoDetalleById(eventoId) {
@@ -20,52 +22,6 @@ export class eventoService {
   }
 
   static async obtenerEventos() {
-    return await await Eventos.findAll({
-      attributes: [
-        "id",
-        "lugar",
-        "nombre_evento",
-        "fecha_inicio",
-        "fecha_fin",
-        "createdAt",
-        "updatedAt",
-        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"],
-      ],
-      include: [
-        {
-          model: Tickets,
-          as: "tickets",
-          attributes: [],
-          required: false,
-        },
-      ],
-      group: ["eventos.id"],
-      raw: true,
-    });
-  }
-
-  static async obtenerTicketsPorEventoYLocalidad() {
-    // Primero agregamos tickets por evento y localidad
-    const ticketsAgrupados = await Tickets.findAll({
-      attributes: [
-        "evento_id",
-        "localidad",
-        [Sequelize.fn("COUNT", Sequelize.col("id")), "cantidad"],
-      ],
-      group: ["evento_id", "localidad"],
-    });
-
-    // Creamos un objeto intermedio para mapear tickets por evento
-    const ticketsPorEvento = {};
-    ticketsAgrupados.forEach((ticket) => {
-      const { evento_id, localidad, cantidad } = ticket.toJSON();
-      if (!ticketsPorEvento[evento_id]) ticketsPorEvento[evento_id] = {};
-      ticketsPorEvento[evento_id][localidad] = parseInt(cantidad);
-    });
-
-    console.log(ticketsPorEvento)
-
-    // Obtenemos todos los eventos
     const eventos = await Eventos.findAll({
       attributes: [
         "id",
@@ -89,18 +45,22 @@ export class eventoService {
       raw: true
     });
 
-    // Mapear tickets agregados a cada evento
-    return eventos.map((evento) => {
-      return {
-        id: evento.id,
-        nombre_evento: evento.nombre_evento,
-        lugar: evento.lugar,
-        fecha_inicio : evento.fecha_inicio,
-        fecha_fin : evento.fecha_fin,
-        tickets_totales: evento.tickets_totales,
-        tickets_localidad: ticketsPorEvento[evento.id] || {},
-      };
-    });
+    // Armar array final con detalles anidados
+    const eventosConDetalle = await Promise.all(
+      eventos.map(async (evento) => {
+        const detalle_localidades = await ticketService.sumarTicketLocalidadByEvento(evento.id);
+        console.log({
+          ...evento,
+          detalle_localidades
+        });
+        return {
+          ...evento,
+          detalle_localidades,
+        };
+      })
+    );
+    console.log(JSON.stringify(eventosConDetalle));
+    return eventosConDetalle;
   }
 
   static async armarEvento(eventoId) {

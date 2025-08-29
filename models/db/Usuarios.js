@@ -9,6 +9,10 @@ const Usuario = db.define('usuarios', {
         primaryKey: true,
         defaultValue: () => uiidv4()
     },
+    rol: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     nombre: {
         type: DataTypes.STRING,
         allowNull: false
