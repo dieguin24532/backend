@@ -75,6 +75,8 @@ const logout = async (req, res) => {
 
 const isAuth = async (req, res) => {
   try {
+    console.log(req);
+    console.log(req.cookie);
     const token = req.cookies.token;
 
     if (!token) {
