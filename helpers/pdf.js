@@ -73,6 +73,7 @@ const generarEntradaPDF = async (ticketId) => {
       `${ticket.localidad.nombre}`,
       16
     );
+
     primeraPagina.drawText(`${ticket.localidad.nombre}`, {
       x: (primeraPagina.getWidth() - textoLocalidad) / 2,
       y: primeraPagina.getHeight() / 2 - 230,
@@ -84,6 +85,7 @@ const generarEntradaPDF = async (ticketId) => {
       `Butaca: ${ticket.etiqueta}`,
       16
     );
+    
     primeraPagina.drawText(`Butaca: ${ticket.etiqueta}`, {
       x: (primeraPagina.getWidth() - textoEtiqueta) / 2,
       y: primeraPagina.getHeight() / 2 - 250,
