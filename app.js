@@ -28,6 +28,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'],   // Cabeceras permitidas
 }));
+app.disabled('x-powered-by');
 app.use(express.json());
 app.use(cookieParser());
 
