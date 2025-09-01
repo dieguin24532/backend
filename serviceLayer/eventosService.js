@@ -4,6 +4,7 @@ import Posts from "../models/db_wordpress/Posts.js";
 import { Op, Sequelize } from "sequelize";
 import { ticketService } from "./ticketsService.js";
 import { raw } from "mysql2";
+import { buscarMetaKey } from "../helpers/utils.js";
 
 export class eventoService {
   static async obtenerEventoDetalleById(eventoId) {
@@ -66,13 +67,12 @@ export class eventoService {
   static async armarEvento(eventoId) {
     const evento = await this.obtenerEventoById(eventoId);
     const eventoDetalle = await this.obtenerEventoDetalleById(eventoId);
-
     return {
       id: eventoId,
       nombre_evento: evento.get("post_title"),
-      fecha_inicio: eventoDetalle[0]?.get("meta_value"),
-      fecha_fin: eventoDetalle[1]?.get("meta_value"),
-      lugar: eventoDetalle[2]?.get("meta_value"),
+      fecha_inicio: buscarMetaKey(eventoDetalle, 'event_date_time'),
+      fecha_fin: buscarMetaKey(eventoDetalle,"event_end_date_time"),
+      lugar: buscarMetaKey(eventoDetalle,"event_location"),
     };
   }
 

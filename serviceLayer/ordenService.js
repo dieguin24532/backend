@@ -28,7 +28,7 @@ export class ordenService {
   static async insertarDatosOrden(orden) {
     const t = await db.transaction();
     const pedido = orden.pedido;
-    console.log(orden);
+    console.log(orden.eventos);
 
     try {
       //Crear el pedido
