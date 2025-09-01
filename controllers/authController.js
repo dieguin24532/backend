@@ -63,7 +63,7 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token", { httpOnly: true, secure: process.env.SECURE });
+    res.clearCookie("token", { httpOnly: true, secure: process.env.SECURE, sameSite: "None" });
     res.status(200).json(ApiResponse.getResponse(200, "Logout exitoso", null));
   } catch (error) {
     console.log(error);
