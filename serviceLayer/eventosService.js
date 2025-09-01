@@ -60,7 +60,6 @@ export class eventoService {
         };
       })
     );
-    console.log(JSON.stringify(eventosConDetalle));
     return eventosConDetalle;
   }
 

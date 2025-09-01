@@ -32,7 +32,7 @@ Future Skills reúne a tres expertos internacionales para entrenar las habilidad
     <li>Karolina Puente - Networking digital de valor.</li>
     <li>Paco Benítez - Comunicación que vende.</li>
   </ul>
-<br><br>
+<br>
 Recomendaciones
 <br>
 	<ul>
@@ -40,7 +40,7 @@ Recomendaciones
     <li>Ten tu QR a mano.</li>
     <li>Trae libreta o notas digitales: habrá ideas accionables.</li>
   </ul>
-<br><br>
+<br>
 Nos vemos muy pronto. 
 El futuro no se improvisa, se entrena.
 <br><br>
