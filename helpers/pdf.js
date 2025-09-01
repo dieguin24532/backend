@@ -4,7 +4,7 @@ import { ticketService } from "../serviceLayer/ticketsService.js";
 const generarEntradaPDF = async (ticketId) => {
     try {
         // URL pública del PDF servido en Render
-        const pdfUrl = `${process.env.URL_PATH}/docs/TICKET_EXMA.pdf`;
+        const pdfUrl = `${process.env.URL_PATH}/docs/future-skills.pdf`;
 
         // Descargar el PDF usando fetch global de Node 18+
         const respuesta = await fetch(pdfUrl);
