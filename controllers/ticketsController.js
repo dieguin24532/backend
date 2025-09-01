@@ -63,7 +63,7 @@ async function verEntrada(req, res) {
     try {
         const ticketId = req.params.id;
         const PDF = await generarEntradaPDF(ticketId);
-        res.setHeader("Content-Disposition", "inline; filename =archivo.pdf");
+        res.setHeader("Content-Disposition", "inline; filename = archivo.pdf");
         res.setHeader("Content-Type", "application/pdf");
         res.send(PDF);
     } catch (error) {

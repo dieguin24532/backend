@@ -33,6 +33,11 @@ export class ticketService {
           as: "evento",
           required: true,
         },
+        {
+          model: Localidades,
+          as: 'localidad',
+          required: true
+        }
       ],
       raw: false,
     });
