@@ -36,8 +36,9 @@ const login = async (req, res) => {
     const matchPassword = await bcrypt.compare(password, usuario.password);
 
     if (email === usuario.email && matchPassword) {
-      const token = crearToken(email);
       const usuario = await Usuario.findOne({ where: { email: email } })
+      console.log(usuario.rol);
+      const token = crearToken(email, usuario.rol);
       return res
         .cookie("token", token, {
           httpOnly: true,
@@ -75,8 +76,6 @@ const logout = async (req, res) => {
 
 const isAuth = async (req, res) => {
   try {
-    console.log(req);
-    console.log(req.cookie);
     const token = req.cookies.token;
 
     if (!token) {
@@ -86,9 +85,8 @@ const isAuth = async (req, res) => {
     }
 
     const payload = jwt.verify(token, process.env.JWT_KEY);
-    req.usuario = payload.usuario;
     const usuarioEncontrado = await Usuario.findOne({
-      where: { email: req.usuario },
+      where: { email: payload.usuario },
     });
 
     if (!usuarioEncontrado) {
@@ -104,4 +102,34 @@ const isAuth = async (req, res) => {
   }
 };
 
-export { login, logout, isAuth };
+const getRoleLoginUser = async (req, res) => {
+    
+  try {
+    
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res
+        .status(401)
+        .json(ApiResponse.getResponse(401, "Token no existe", false));
+    }
+
+    const payload = jwt.verify(token, process.env.JWT_KEY);
+    const usuarioEncontrado = await Usuario.findOne({
+      where: { email: payload.usuario },
+    });
+
+    if (!usuarioEncontrado) {
+      return res
+        .status(403)
+        .json(ApiResponse.getResponse(403, "Token inválido", false));
+    }
+
+    res.status(200).json(ApiResponse.getResponse(200, "Token válido", payload.rol));
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(ApiResponse.getResponse(500, "Token inválido", false));
+  }
+}
+
+export { login, logout, isAuth, getRoleLoginUser };
