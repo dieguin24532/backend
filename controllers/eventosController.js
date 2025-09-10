@@ -1,10 +1,9 @@
 import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 import { eventoService } from "../serviceLayer/eventosService.js";
-import { eventoDTO } from "../dtos/eventoDTO.js";
 
 async function obtenerEventos(req, res) {
     try {
-        // const eventos = await eventoService.obtenerEventos();
+
         const eventos = await eventoService.obtenerEventos();
 
         if (eventos.length === 0) {
@@ -13,8 +12,7 @@ async function obtenerEventos(req, res) {
                 .json(ApiResponse.getResponse(200, "No se encontraron eventos"));
         }
 
-        const eventosFormateados = eventos.map((evento) => eventoDTO(evento)
-        );
+
         res
             .status(200)
             .json(ApiResponse.getResponse(200, "Eventos obtenidos", eventos));

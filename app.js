@@ -46,10 +46,10 @@ try {
 app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
 app.use('/sendgrid', sendgridRouter);
-app.use('/eventos', verificarToken, eventosRouter);
-app.use('/usuarios', verificarToken, usuariosRouter);
-app.use('/pedidos', verificarToken, pedidosRouter);
-app.use('/tickets', verificarToken, ticketsRouter);
+app.use('/eventos', verificarToken([1,2]), eventosRouter);
+app.use('/usuarios', verificarToken([1]), usuariosRouter);
+app.use('/pedidos', verificarToken([1,2]), pedidosRouter);
+app.use('/tickets', verificarToken([1,2]), ticketsRouter);
 
 // Servir la carpeta "docs" como estática
 const __filename = fileURLToPath(import.meta.url);

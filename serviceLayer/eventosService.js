@@ -50,10 +50,6 @@ export class eventoService {
     const eventosConDetalle = await Promise.all(
       eventos.map(async (evento) => {
         const detalle_localidades = await ticketService.sumarTicketLocalidadByEvento(evento.id);
-        console.log({
-          ...evento,
-          detalle_localidades
-        });
         return {
           ...evento,
           detalle_localidades,

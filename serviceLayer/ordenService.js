@@ -28,7 +28,6 @@ export class ordenService {
   static async insertarDatosOrden(orden) {
     const t = await db.transaction();
     const pedido = orden.pedido;
-    console.log(orden.eventos);
 
     try {
       //Crear el pedido
@@ -48,6 +47,9 @@ export class ordenService {
         })
       );
 
+      if(orden.tickets.lenght === 0 || !orden.tickets) {
+        throw new Error("No existen tickets en el pedido")
+      }
       // Inserta los tickets del pedido
       for (let element of orden.tickets) {
         let ticketCreado = await ticketService.crearTicket(element, t);
