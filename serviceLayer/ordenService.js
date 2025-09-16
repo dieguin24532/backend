@@ -1,8 +1,10 @@
+import db from "../config/db.js";
 import { eventoService } from "./eventosService.js";
 import { ticketService } from "./ticketsService.js";
 import { pedidoService } from "./pedidosService.js";
-import db from "../config/db.js";
+import { localidadService } from "./localidadesService.js";
 import { generarCodigoQR } from "../helpers/codigosQr.js";
+import { buscarMetaKey } from "../helpers/utils.js";
 
 export class ordenService {
   static async generarOrden(pedido) {
@@ -14,8 +16,7 @@ export class ordenService {
     try {
       await pedidoService.eliminarPedido(pedido);
     } catch (error) {
-      throw (error);
-      
+      throw error;
     }
   }
 
@@ -39,16 +40,30 @@ export class ordenService {
         })
       );
 
+      // Inserta las localidades del
+      await Promise.all(
+        orden.localidades.map(async (localidad) => {
+          await localidadService.crearOBuscarLocalidad(localidad, t);
+        })
+      );
+
+      if(orden.tickets.lenght === 0 || !orden.tickets) {
+        throw new Error("No existen tickets en el pedido")
+      }
       // Inserta los tickets del pedido
-      for (let ticket of orden.tickets) {
-        let nuevoTicket = await ticketService.crearTicket(ticket, t);
-        const codigoQr = await generarCodigoQR(nuevoTicket.id)
-        await nuevoTicket.update({ codigo_qr: codigoQr }, { transaction: t });
+      for (let element of orden.tickets) {
+        let ticketCreado = await ticketService.crearTicket(element, t);
+        const codigoQr = await generarCodigoQR(ticketCreado.id);
+        ticketCreado = await ticketCreado.update(
+          { codigo_qr: codigoQr },
+          { transaction: t }
+        );
       }
 
       await t.commit();
     } catch (error) {
       await t.rollback();
+      throw new Error(error);
     }
   }
 
@@ -58,53 +73,62 @@ export class ordenService {
    * @param orden
    */
   static async prepararDatosOrden(pedido) {
-    let eventos = [];
-    const tickets = await ticketService.obtenerTicketsByPedido(pedido.id);
-
-    let ticketsConDetalle = await Promise.all(
-      tickets.map(async (ticket) => {
-        const detalleTicket = await ticketService.obtenerTicketDetalleById(
-          ticket.get("ID")
-        );
-
-        const eventoId =
-          detalleTicket
-            .find((item) => item.get("meta_key") === "event_id")
-            ?.get("meta_value") || null;
-
-        const localidadId =
-          detalleTicket
-            .find((item) => item.get("meta_key") === "ticket_type_id")
-            ?.get("meta_value") || null;
-
-        const etiquetaAsiento =
-          detalleTicket
-            .find((item) => item.get("meta_key") === "seat_label")
-            ?.get("meta_value") || null;
-
-        const eventoInsertar = await eventoService.armarEvento(eventoId);
-
-        if (!eventos.find((evento) => evento.id === eventoInsertar.id)) {
-          eventos.push(eventoInsertar);
-        }
-
-        const ticketInsertar = {
-          evento_id: eventoId,
-          etiqueta: etiquetaAsiento,
-          localidad: localidadId,
-          pedido_id: pedido.id,
-        };
-
-        return {
-          ...ticketInsertar,
-        };
-      })
-    );
-    
-    return {
-      pedido: pedido,
-      tickets: ticketsConDetalle,
-      eventos: eventos,
-    };
+    try {
+      let eventos = []; //Array que contiene las localidades de la orden
+      let localidades = []; //Array que contiene las localidades de la orden
+  
+      const tickets = await ticketService.obtenerTicketsByPedido(pedido.id);
+  
+      let ticketsConDetalle = await Promise.all(
+        tickets.map(async (ticket) => {
+          const detalleTicket = await ticketService.obtenerTicketDetalleById(
+            ticket.get("ID")
+          );
+  
+          const eventoId = buscarMetaKey(detalleTicket, "event_id");
+          const localidadId = buscarMetaKey(detalleTicket, "ticket_type_id");
+          const etiquetaAsiento = buscarMetaKey(detalleTicket, "seat_label");
+  
+          const eventoInsertar = await eventoService.armarEvento(eventoId);
+          const localidadInsertar = await localidadService.armarLocalidad(
+            localidadId
+          );
+  
+          if (!eventos.find((evento) => evento.id === eventoInsertar.id)) {
+            eventos.push(eventoInsertar);
+          }
+  
+          if (
+            !localidades.find(
+              (localidad) => localidad.id === localidadInsertar.id
+            )
+          ) {
+            localidades.push(localidadInsertar);
+          }
+  
+          const ticketInsertar = {
+            evento_id: eventoId,
+            etiqueta: etiquetaAsiento,
+            _id: localidadId,
+            pedido_id: pedido.id,
+            localidad_id: localidadId
+          };
+  
+          return {
+            ...ticketInsertar,
+          };
+        })
+      );
+  
+      return {
+        pedido: pedido,
+        tickets: ticketsConDetalle,
+        eventos: eventos,
+        localidades: localidades,
+      };
+      
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

@@ -3,12 +3,21 @@ import Pedidos from "../models/db/Pedidos.js";
 import { ordenService } from "../serviceLayer/ordenService.js";
 import { pedidoService } from "../serviceLayer/pedidosService.js";
 
+/**
+ * Procesa la actualización de un pedido desde una fuente externa (e.g. WooCommerce).
+ * - Si el estado del pedido es "completed", se genera una orden.
+ * - Si no, se elimina la orden correspondiente.
+ */
 async function recibirActualizaciónPedido(req, res) {
   try {
     const data = req.body;
+
+    // Extrae el RUC o cédula desde los metadatos del pedido
     const ruc_cedula = data.meta_data.find(
       (meta) => meta.key === "_billing_ruc_o_cedula"
     );
+
+    // Estructura de datos del pedido a registrar o eliminar
     let pedido = {
       id: data.id,
       ruc_cedula: ruc_cedula.value,
@@ -20,7 +29,7 @@ async function recibirActualizaciónPedido(req, res) {
     };
 
     if (data.status == "completed") {
-      //Crea el pedido
+      // Crea la orden si el pedido fue completado
       pedido = await ordenService.generarOrden(pedido);
       console.log("Insertado");
       return res
@@ -29,7 +38,7 @@ async function recibirActualizaciónPedido(req, res) {
           ApiResponse.getResponse(200, "Pedido ingresado correctamente", pedido)
         );
     } else {
-      //Borra el pedido
+      // Elimina la orden si el pedido fue cancelado u otro estado
       pedido = await ordenService.eliminarOrden(pedido);
       console.log("Eliminado");
       return res
@@ -46,6 +55,11 @@ async function recibirActualizaciónPedido(req, res) {
   }
 }
 
+
+/**
+ * Obtiene todos los pedidos registrados.
+ * Devuelve la lista completa o un mensaje si está vacía.
+ */
 async function obtenerPedidos(req, res) {
   
   try {
@@ -63,18 +77,22 @@ async function obtenerPedidos(req, res) {
   }
 }
 
+
+/**
+ * Actualiza el correo electrónico de un pedido específico.
+ */
 async function actualizarEmail(req, res) {
   try {
     const pedido = req.body;
     
-    const insertado = await Pedidos.update(
+    const [ updatedRows] = await Pedidos.update(
       { email: pedido.email },
       {
         where: { id: pedido.id }
       }
     );
 
-    res.status(200).json(ApiResponse.getResponse(200, 'Actualizado correctamente', insertado))
+    res.status(200).json(ApiResponse.getResponse(200, 'Actualizado correctamente', updatedRows))
   } catch (error) {
     console.log(error);
   }

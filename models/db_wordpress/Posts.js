@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import dbTickets from "../../config/db_wordpress.js";
 
-const Posts = dbTickets.define('dqgl_posts', {
+const Posts = dbTickets.define('wp_posts', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true

@@ -1,6 +1,8 @@
 import Eventos from "./Eventos.js";
 import Tickets from "./Tickets.js";
 import Pedidos from "./Pedidos.js";
+import Localidades from "./Localidades.js";
+import TicketsEmailLogs from "./TicketsEmailLogs.js"
 
 Eventos.hasMany(Tickets, {
   foreignKey: "evento_id",
@@ -27,5 +29,29 @@ Tickets.belongsTo(Pedidos, {
   as: "pedido",
 });
 
+Tickets.hasMany(TicketsEmailLogs, {
+  foreignKey: "ticket_id",
+  targetKey: "id",
+  as: "tickets_log",
+  onDelete: 'CASCADE'
+})
 
-export { Eventos, Tickets, Pedidos };
+TicketsEmailLogs.belongsTo(Tickets, {
+  foreignKey: "ticket_id",
+  targetKey: "id",
+  as: "pedido"
+})
+
+Localidades.hasMany(Tickets, {
+  foreignKey: "localidad_id",
+  targetKey: "id",
+  as: "tickets"
+})
+
+Tickets.belongsTo(Localidades, {
+  foreignKey: "localidad_id",
+  targetKey: "id",
+  as: "localidad"
+})
+
+export { Eventos, Tickets, Pedidos, TicketsEmailLogs, Localidades };

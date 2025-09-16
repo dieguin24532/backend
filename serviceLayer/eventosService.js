@@ -1,9 +1,15 @@
-import { Eventos, Tickets } from "../models/db/index.js";
+import { Eventos, Localidades, Tickets } from "../models/db/index.js";
 import PostsMeta from "../models/db_wordpress/Post-meta.js";
 import Posts from "../models/db_wordpress/Posts.js";
 import { Op, Sequelize } from "sequelize";
+import { ticketService } from "./ticketsService.js";
+import { buscarMetaKey } from "../helpers/utils.js";
 
 export class eventoService {
+
+  /**
+   * Devuleve los detalles del evento que se obtienen desde Wordpress
+   */
   static async obtenerEventoDetalleById(eventoId) {
     return await PostsMeta.findAll({
       where: {
@@ -15,12 +21,18 @@ export class eventoService {
     });
   }
 
+  /**
+   * Obtiene un evento por Id
+   */
   static async obtenerEventoById(idEvento) {
     return await Posts.findByPk(idEvento);
   }
 
+  /**
+   * Obtiene todos los eventos desde la base de datos de la web
+   */
   static async obtenerEventos() {
-    return await await Eventos.findAll({
+    const eventos = await Eventos.findAll({
       attributes: [
         "id",
         "lugar",
@@ -29,7 +41,7 @@ export class eventoService {
         "fecha_fin",
         "createdAt",
         "updatedAt",
-        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"]
+        [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"],
       ],
       include: [
         {
@@ -40,23 +52,40 @@ export class eventoService {
         },
       ],
       group: ["eventos.id"],
-      raw: true, // ✅ esto entrega objetos planos con el campo "tickets"
+      raw: true
     });
+
+    // Armar array final con detalles anidados
+    const eventosConDetalle = await Promise.all(
+      eventos.map(async (evento) => {
+        const detalle_localidades = await ticketService.sumarTicketLocalidadByEvento(evento.id);
+        return {
+          ...evento,
+          detalle_localidades,
+        };
+      })
+    );
+    return eventosConDetalle;
   }
 
+  /**
+   * Arma el evento desde la base de datos de Wordpress
+   */
   static async armarEvento(eventoId) {
     const evento = await this.obtenerEventoById(eventoId);
     const eventoDetalle = await this.obtenerEventoDetalleById(eventoId);
-
     return {
       id: eventoId,
       nombre_evento: evento.get("post_title"),
-      fecha_inicio: eventoDetalle[0]?.get("meta_value"),
-      fecha_fin: eventoDetalle[1]?.get("meta_value"),
-      lugar: eventoDetalle[2]?.get("meta_value"),
+      fecha_inicio: buscarMetaKey(eventoDetalle, 'event_date_time'),
+      fecha_fin: buscarMetaKey(eventoDetalle,"event_end_date_time"),
+      lugar: buscarMetaKey(eventoDetalle,"event_location"),
     };
   }
 
+  /**
+   * Crear un evento en el caso de que no exista
+   */
   static async crearOBuscarEvento(evento, transaction) {
     return await Eventos.findOrCreate({
       where: { ID: evento.id },

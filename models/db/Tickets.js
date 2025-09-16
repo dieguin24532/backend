@@ -30,8 +30,13 @@ const Tickets = db.define("tickets", {
   etiqueta: {
     type: DataTypes.STRING,
   },
-  localidad: {
-    type: DataTypes.STRING,
+  localidad_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: "localidades",
+      key: "id"
+    }
   },
   correo_enviado: {
     type: DataTypes.BOOLEAN,
