@@ -26,6 +26,7 @@ export class pedidoService {
     });
   }
 
+
   static async obtenerPedidos() {
     return await Pedidos.findAll({
       attributes: [

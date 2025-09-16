@@ -3,9 +3,10 @@ import { getRoleLoginUser, isAuth, login, logout } from '../controllers/authCont
 
 const router = express.Router();
 
-router.post('/login', login);
 router.get('/logout', logout);
 router.get('/isauth', isAuth);
 router.get('/rol', getRoleLoginUser);
+
+router.post('/login', login);
 
 export default router;

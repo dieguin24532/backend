@@ -3,7 +3,10 @@ import { enviarEmail } from "../helpers/emails.js";
 import { ticketService } from "../serviceLayer/ticketsService.js";
 import { generarEntradaPDF } from "../helpers/pdf.js";
 
-
+/**
+ * Obtiene todos los ticketes registrados.
+ * Si existen, transforma el campo `correo_enviado` a booleano explícito
+ */
 async function obtenerTickets(req, res) {
     try {
         const tickets = await ticketService.obtenerTickets();   
@@ -31,6 +34,10 @@ async function obtenerTickets(req, res) {
     }
 }
 
+/**
+ * Obtiene los tickets asociados a un evento específico.
+ * Transforma el campo `correo_enviado` a booleano explícito.
+ */
 async function obtenerTicketsByEvento(req, res) {
     const ticketId = req.params.id;
     try {
@@ -59,6 +66,10 @@ async function obtenerTicketsByEvento(req, res) {
     }
 }
 
+/**
+ * Devuelve el archivo PDF generado para un ticket específico.
+ * Establece cabeceras para mostrar el PDF en línea.
+ */
 async function verEntrada(req, res) {
     try {
         const ticketId = req.params.id;
@@ -75,11 +86,8 @@ async function verEntrada(req, res) {
 }
 
 /**
- * Método que recibe como parametro en la url el id del ticket
- * obtiene toda la información del ticket, genera el PDF y envia el
- * correo 
- * @param {*} req 
- * @param {*} res 
+ * Genera el PDF de un ticket y lo envía por correo electrónico.
+ * Actualiza el campo `correo_enviado` del ticket una vez enviado.
  */
 async function enviarEntrada(req, res) {
     try {
@@ -97,4 +105,9 @@ async function enviarEntrada(req, res) {
     }
 }
 
-export { obtenerTickets, verEntrada, enviarEntrada, obtenerTicketsByEvento };
+export { 
+    obtenerTickets,
+    verEntrada,
+    enviarEntrada,
+    obtenerTicketsByEvento 
+};

@@ -1,6 +1,9 @@
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { ticketService } from "../serviceLayer/ticketsService.js";
 
+/**
+ * Genera el archivo PDF de un ticket que se recibe como parámetro
+ */
 const generarEntradaPDF = async (ticketId) => {
   try {
     // URL pública del PDF servido en Render
@@ -102,6 +105,9 @@ const generarEntradaPDF = async (ticketId) => {
 
 export default generarEntradaPDF;
 
+/**
+ * Transforma una cadena de Base64 a un array de binarios
+ */
 const base64Bytes = (cadenaBase64) => {
   const cadenaBinaria = atob(cadenaBase64);
   const bytes = new Uint8Array(cadenaBinaria.length);

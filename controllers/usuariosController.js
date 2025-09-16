@@ -7,34 +7,26 @@ import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 import { mapearErrores } from "../helpers/errores.js";
 
 /**
- * Verfica que el usuario no exista en la base de datos
- * si existe devuelve un mensaje de error
- * caso contrario crea el usuario
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * Crea un nuevo usuario si el email no está registrado
  */
 const guardarUsuario = async (req, res) => {
   try {
-    //Validación nombre
+
     await check("nombre")
         .notEmpty().withMessage("El nombre es obligatorio")
         .isLength({ min: 3 }). withMessage("El nombre debe tener al menos 3 caracteres")
         .run(req);
 
-    //Validación email
     await check("email")
         .notEmpty().withMessage("El email es obligatorio")
         .isEmail().withMessage("El campo debe ser un mail válido")
         .run(req);
 
-    //Validación password
     await check("password")
         .notEmpty().withMessage("La contraseña es obligatoria")
         .isLength( {min: 8, max: 24}).withMessage("La contraseña debe tener entre 8 y 24 caracteres")
         .run(req)
 
-    //Validación rol
     await check("rol")
       .notEmpty().withMessage("El rol es obligatorio")
       .isInt().withMessage("El campo es un número")
@@ -43,7 +35,7 @@ const guardarUsuario = async (req, res) => {
 
     let errores = validationResult(req);//Almacena las respuesta con los errores
 
-    //Mapear los errores
+    // Mapea los errores para no exponer información sensible
     if (!errores.isEmpty()) {
       const erroresMapedos = mapearErrores(errores);
       return res.status(422).json(ApiResponse.getResponse(422, 'Campos no válidos', erroresMapedos))
@@ -80,12 +72,7 @@ const guardarUsuario = async (req, res) => {
 
 
 /**
- * Busca en la base de datos los usuarios
- * si existen devuelve los usuarios
- * caso contrario devuleve que no existen registros
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * Retorna todos los usuarios registrados (formateados con DTO)
  */
 const obtenerUsuarios = async (req, res) => {
   try {
@@ -124,10 +111,7 @@ const obtenerUsuarios = async (req, res) => {
 
 
 /**
- * Devuelve el usuario que se encuentra logueado
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * Retorna el usuario autenticado a partir del token
  */
 const obtenerUsuarioLogin = async (req, res) => {
   try {

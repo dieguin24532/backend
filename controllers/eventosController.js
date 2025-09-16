@@ -1,6 +1,10 @@
 import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 import { eventoService } from "../serviceLayer/eventosService.js";
 
+/**
+ * Obtiene todos los eventos registrados.
+ * Devuelve un array de eventos o un mensaje si no hay resultados.
+ */
 async function obtenerEventos(req, res) {
     try {
 
