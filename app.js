@@ -17,6 +17,10 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dbTickets from "./config/db_wordpress.js";
 
+//OpenAPI
+import { swaggerSpec } from './swaggerConfig.js';
+import swaggerUi from 'swagger-ui-express';
+
 //Instancio en la variable app el middleware de express
 const app = express();
 const port = process.env.PORT || 3000;
@@ -28,7 +32,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'],   // Cabeceras permitidas
 }));
-app.disabled('x-powered-by');
+app.disable('x-powered-by');
 app.use(express.json());
 app.use(cookieParser());
 
@@ -57,6 +61,9 @@ const __dirname = path.dirname(__filename);
 
 // Solución para Render: usar rutas absolutas y verificar la carpeta
 app.use("/docs", express.static(path.join(__dirname, "docs")));
+
+//Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Iniciar el servidor
 app.listen(port, () => {
