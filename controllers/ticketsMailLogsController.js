@@ -1,13 +1,20 @@
-import { response } from "express";
 import { TicketsEmailLogs } from "../models/db/index.js";
 import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 
+/**
+ * Almacena un log de eventos de email recibido desde un webhook
+ * - Registra el evento si no existe previamente en la base de datos 
+ */
 async function almacenarLogs(req, res) {
   try {
+    // Obtiene el primer evento del arreglo recibido (asume que es un array de eventos)
     const responseHook = req.body[0];
+
+    // Convierte el timestamp UNIX (segundos) a formato Date
     const timestampMilisegundos = responseHook.timestamp * 1000;
     const fecha = new Date(timestampMilisegundos);
 
+     // Construye el objeto que representa el log de email
     const emailLog = {
       id: responseHook.sg_event_id,
       ticket_id: responseHook.correo_id,
@@ -16,6 +23,7 @@ async function almacenarLogs(req, res) {
       email: responseHook.email
     };
 
+    // Inserta el log solo si no existe previamente
     const [ticketLog, created] = await TicketsEmailLogs.findOrCreate({
         where: {
             id: emailLog.id
@@ -37,6 +45,11 @@ async function almacenarLogs(req, res) {
   }
 }
 
+
+/**
+ * Devuelve todos los logs de eventos de email relacionados a un ticket.
+ * - Se filtra por `ticket_id` recibido como parámetro en la URL.
+ */
 async function obtenerLogsByTicketID(req, res) {
 
   try {

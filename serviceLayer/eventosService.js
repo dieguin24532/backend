@@ -3,10 +3,13 @@ import PostsMeta from "../models/db_wordpress/Post-meta.js";
 import Posts from "../models/db_wordpress/Posts.js";
 import { Op, Sequelize } from "sequelize";
 import { ticketService } from "./ticketsService.js";
-import { raw } from "mysql2";
 import { buscarMetaKey } from "../helpers/utils.js";
 
 export class eventoService {
+
+  /**
+   * Devuleve los detalles del evento que se obtienen desde Wordpress
+   */
   static async obtenerEventoDetalleById(eventoId) {
     return await PostsMeta.findAll({
       where: {
@@ -18,10 +21,16 @@ export class eventoService {
     });
   }
 
+  /**
+   * Obtiene un evento por Id
+   */
   static async obtenerEventoById(idEvento) {
     return await Posts.findByPk(idEvento);
   }
 
+  /**
+   * Obtiene todos los eventos desde la base de datos de la web
+   */
   static async obtenerEventos() {
     const eventos = await Eventos.findAll({
       attributes: [
@@ -59,6 +68,9 @@ export class eventoService {
     return eventosConDetalle;
   }
 
+  /**
+   * Arma el evento desde la base de datos de Wordpress
+   */
   static async armarEvento(eventoId) {
     const evento = await this.obtenerEventoById(eventoId);
     const eventoDetalle = await this.obtenerEventoDetalleById(eventoId);
@@ -71,6 +83,9 @@ export class eventoService {
     };
   }
 
+  /**
+   * Crear un evento en el caso de que no exista
+   */
   static async crearOBuscarEvento(evento, transaction) {
     return await Eventos.findOrCreate({
       where: { ID: evento.id },

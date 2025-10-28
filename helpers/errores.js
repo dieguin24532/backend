@@ -1,3 +1,6 @@
+/**
+ * Mapea los errores del ExpressValidator, evita mostrar información sensible de los datos
+ */
 const mapearErrores = (errores) => {
     const erroresMapeados = {}
 

@@ -2,6 +2,11 @@ import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 import jwt from "jsonwebtoken";
 import Usuario from "../models/db/Usuarios.js";
 
+/**
+ * Verifica el acceso de los usuarios a las rutas, por roles permitidos en cada una de los endpoints
+ * @param {*} rolesPermitidos 
+ * @returns 
+ */
 const verificarToken = (rolesPermitidos = []) => {
   return async (req, res, next) => {
     try {

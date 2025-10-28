@@ -1,3 +1,7 @@
+/**
+ * Busca el valor de un meta_key
+ * Recibe el array de busqueda y el metakey que se debe buscar
+ */
 const buscarMetaKey = (array, meta_key) => {
           return array
             .find((item) => item.get("meta_key") === meta_key)
