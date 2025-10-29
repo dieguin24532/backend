@@ -20,6 +20,7 @@ import dbTickets from "./config/db_wordpress.js";
 //OpenAPI
 import { swaggerSpec } from './swaggerConfig.js';
 import swaggerUi from 'swagger-ui-express';
+import { errorHandler } from "./middleware/error.middleware.js";
 
 //Instancio en la variable app el middleware de express
 const app = express();
@@ -51,7 +52,7 @@ app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
 app.use('/sendgrid', sendgridRouter);
 app.use('/eventos', verificarToken([1,2]), eventosRouter);
-app.use('/usuarios', verificarToken([1]), usuariosRouter);
+app.use('/usuarios', usuariosRouter);
 app.use('/pedidos', verificarToken([1,2]), pedidosRouter);
 app.use('/tickets', verificarToken([1,2]), ticketsRouter);
 
@@ -64,7 +65,8 @@ app.use("/docs", express.static(path.join(__dirname, "docs")));
 
 //Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+//Middleware de errores
+app.use(errorHandler);
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`Programa escuchando en el puerto ${port}`);
