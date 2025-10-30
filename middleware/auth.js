@@ -23,7 +23,6 @@ const verificarToken = (rolesPermitidos = []) => {
 
       //Verifica el token
       const payload = jwt.verify(token, process.env.JWT_KEY);
-      console.log(payload);
 
       //Confirmar si el usuariuo aún existe ne la base de datos
       const usuarioEncontrado = await Usuario.findOne({
@@ -37,6 +36,8 @@ const verificarToken = (rolesPermitidos = []) => {
           .json(ApiResponse.getResponse(403, "Token inválido: usuario no encontrado", null));
       }
 
+      console.log("roles"+rolesPermitidos);
+      console.log(payload.rol);
       if(rolesPermitidos.length > 0 && !rolesPermitidos.includes(payload.rol)) {
         return res
                 .status(403).json(ApiResponse.getResponse(403, "Acceso denegado: rol no autorizado", null));

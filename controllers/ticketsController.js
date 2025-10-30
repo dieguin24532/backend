@@ -2,6 +2,9 @@ import { ApiResponse } from "../dtos/ApiResponseDTO.js";
 import { enviarEmail } from "../helpers/emails.js";
 import { ticketService } from "../serviceLayer/ticketsService.js";
 import { generarEntradaPDF } from "../helpers/pdf.js";
+import Tickets from "../models/db/Tickets.js";
+import Eventos from "../models/db/Eventos.js";
+import { ApiResponseHelper } from "../helpers/apiResponse.js";
 
 /**
  * Obtiene todos los ticketes registrados.
@@ -74,15 +77,19 @@ async function verEntrada(req, res) {
     try {
         const ticketId = req.params.id;
         const PDF = await generarEntradaPDF(ticketId);
-        res.setHeader("Content-Disposition", "inline; filename = archivo.pdf");
+
+        // Generar un nombre de archivo dinámico, por ejemplo:
+        const fileName = `ticket_${ticketId}_${Date.now()}.pdf`;
+
+        res.setHeader("Content-Disposition", `inline; filename="${fileName}"`);
         res.setHeader("Content-Type", "application/pdf");
-        res.send(PDF);
+        res.send(Buffer.from(PDF));
     } catch (error) {
-                res
+        console.error(error);
+        res
             .status(500)
             .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
     }
-
 }
 
 /**
@@ -105,9 +112,51 @@ async function enviarEntrada(req, res) {
     }
 }
 
+async function validarEntrada(req, res) {
+    try {
+        // Solicita el id_evento, id_ticket
+        const { ticket_id, evento_id } = req.body;
+        // Verificar que existe el evento
+        const existeEvento = await Eventos.findByPk(evento_id);
+
+        if(!existeEvento) {
+            return res.status(404).json(ApiResponseHelper.error(404, 'EVENT_NOT_FOUND' , "El evento no existe", ));
+        }
+
+        // Verificar si el ticket pertenece al evento
+        const ticket = await Tickets.findOne({
+            where: {
+                evento_id: evento_id,
+                id: ticket_id
+            }
+        })
+
+        if(!ticket) {
+            return res.status(404).json(ApiResponseHelper.error(404, 'EVENT_DONT_HAVE_TICKET', "El ticket no existe en este evento"));
+        }
+        
+        // Verificar si ya esta escaneado
+        if(ticket.escaneado) {
+           return res.status(409).json(ApiResponseHelper.error(409, 'TICKET_ALREADY_SCANNED', "El ticket ya fue escaneado previamente", {asiento: ticket.etiqueta}))
+        }
+
+        ticket.escaneado = 1;
+        await ticket.save();
+
+        return res
+            .status(200)
+            .json(ApiResponseHelper.success(200, "Codigo escaneado correctamente"));
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(ApiResponse.getResponse(500, "Error interno del servidor", null))
+    }
+}
+
 export { 
     obtenerTickets,
     verEntrada,
     enviarEntrada,
-    obtenerTicketsByEvento 
+    obtenerTicketsByEvento,
+    validarEntrada
 };

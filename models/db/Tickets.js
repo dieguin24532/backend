@@ -44,7 +44,12 @@ const Tickets = db.define("tickets", {
   },
   escaneado_por: {
     type: DataTypes.STRING,
-
+  },
+  escaneado: {
+    type: DataTypes.TINYINT,
+    get() {
+      return this.getDataValue('escaneado') === 1;
+    }
   }
 });
 

@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.get('/', obtenerPedidos);
 
-router.put('/', actualizarEmail);
-
+router.put('/', actualizarEmail);     
 
 export default router;
