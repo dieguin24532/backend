@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import path from "path";
 import { fileURLToPath } from "url";
 //Importo express
@@ -22,29 +23,64 @@ import { swaggerSpec } from './swaggerConfig.js';
 import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from "./middleware/error.middleware.js";
 
+console.log({
+  DB_HOST: process.env.DB_HOST,
+  DB_USER: process.env.DB_USER,
+  DB_NAME: process.env.DB_NAME
+});
+
+
 //Instancio en la variable app el middleware de express
 const app = express();
 const port = process.env.PORT || 3000;
 
 //Habilitar recibir peticiones HTTP con body
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://ticket.galaacademy.com'
+];
+
 app.use(cors({
-  origin: ['http://localhost:4200', 'https://ticket.galaacademy.com'], // Dominio del frontend
-  credentials: true,              // Permitir envío de cookies
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'],   // Cabeceras permitidas
+  origin: function (origin, callback) {
+    console.log('CORS Request Origin:', origin);
+    // Permitir requests sin origin (Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, origin);
+    } 
+    console.log('CORS Request Blocked:', origin);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept'
+  ],
+  exposedHeaders: ['Set-Cookie']
 }));
 app.disable('x-powered-by');
 app.use(express.json());
 app.use(cookieParser());
+console.log('hola');
 
 //Sincronizar la base de datos
 try {
-  await db.authenticate();
+  
   await dbTickets.authenticate();
   await db.sync();
   console.log('Conexión con la base de datos exitosa');
 } catch (error) {
   console.log('Error al conectarse con la base de datos:' + error);
+}
+
+try {
+  await db.authenticate();
+  console.log('se conecto');
+} catch(error) {
+  console.log('no se conecto');
 }
 
 //Routing

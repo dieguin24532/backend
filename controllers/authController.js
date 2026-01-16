@@ -27,6 +27,8 @@ const login = async (req, res) => {
       // .withMessage("La contraseña debe tener entre 8 y 24 caracteres")
       .run(req);
 
+      console.log(req.body);
+
     const errores = validationResult(req);
 
     if (!errores.isEmpty()) {
@@ -57,11 +59,15 @@ const login = async (req, res) => {
         );
     }
 
+    const usuarios = await Usuario.findAll();
+    console.log(usuarios);
     const usuario = await Usuario.findOne({
       where: {
         email: email,
       },
     });
+
+    console.log(usuario);
 
     if (!usuario) {
       return res

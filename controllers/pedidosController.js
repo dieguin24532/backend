@@ -29,6 +29,7 @@ async function recibirActualizaciónPedido(req, res) {
     };
 
     if (data.status == "completed") {
+      // TODO: Este se encarga de generar la orden debo cancelarlo
       // Crea la orden si el pedido fue completado
       pedido = await ordenService.generarOrden(pedido);
       console.log("Insertado");
