@@ -18,23 +18,23 @@ const enviarEmail = async (archivo, ticket) => {
     to: `${ticket.pedido.email}`,
     from: process.env.SENDGRID_HOST_EMAIL,
     subject: `Tu entrada para el evento ${evento.nombre_evento} está confirmada 🎟`,
-    text: "Es un placer darte la bienvenida nuestro Taller de Future Skills",
+    text: "Es un placer darte la bienvenida nuestro Taller de Ventas Salvajes 2",
     html: `<div style="color: #000">
 
     Hola, ${ticket.pedido.cliente}:<br><br>
 
-    ¡Felicidades! Tu compra para Future Skills 2025 ha sido confirmada.<br>
+    ¡Felicidades! Tu compra para Ventas Salvajes 2 con Sandro Meléndez ha sido confirmada.<br>
     Tu entrada:
     <br>
     Adjuntamos tu e-ticket con código QR. Preséntalo desde tu móvil (o impreso) en el ingreso. Recomendamos llegar 30 minutos antes para un registro cómodo.
     <br><br>
-    Qué vas a vivir
-    Future Skills reúne a tres expertos internacionales para entrenar las habilidades que transforman tu carrera y tu negocio:
-    	<ul>
-        <li>Izanami Martínez - Mentalidad y potencial.</li>
-        <li>Karolina Puente - Networking digital de valor.</li>
-        <li>Paco Benítez - Comunicación que vende.</li>
-      </ul>
+    Qué vas a vivir<br>
+    El entrenamiento en ventas más poderoso de Latinoamérica llega con una nueva edición cargada de estrategia, impacto y resultados reales.
+    Sandro Meléndez el master trainer más influyente de la región vuelve con Ventas Salvajes 2, un entrenamiento renovado que parte de su nuevo libro y que ya ha transformado a más de 7.000 vendedores y equipos en Colombia y Ecuador.
+    <br>
+    Prepárate para un evento donde no solo aprenderás a vender… 
+    <br>aprenderás a cerrar sin miedo, sin excusas y con resultados medibles.
+    <br>
     <br>
     Recomendaciones
     <br>
@@ -45,7 +45,6 @@ const enviarEmail = async (archivo, ticket) => {
       </ul>
     <br>
     Nos vemos muy pronto. 
-    El futuro no se improvisa, se entrena.
     <br><br>
     Equipo Gala Academy.</div>`,
 
