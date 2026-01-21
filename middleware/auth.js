@@ -8,6 +8,7 @@ import Usuario from "../models/db/Usuarios.js";
  * @returns 
  */
 const verificarToken = (rolesPermitidos = []) => {
+  
   return async (req, res, next) => {
     try {
       //Obtiene el token de la cookie

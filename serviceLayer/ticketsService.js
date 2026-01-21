@@ -62,6 +62,9 @@ export class ticketService {
           model: Eventos,
           as: "evento",
           attributes: [],
+          where: {
+            activo: 1
+          }
         },
         {
           model: Pedidos,

@@ -1,7 +1,7 @@
 import { Eventos, Localidades, Tickets } from "../models/db/index.js";
 import PostsMeta from "../models/db_wordpress/Post-meta.js";
 import Posts from "../models/db_wordpress/Posts.js";
-import { Op, Sequelize } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 import { ticketService } from "./ticketsService.js";
 import { buscarMetaKey } from "../helpers/utils.js";
 
@@ -41,8 +41,12 @@ export class eventoService {
         "fecha_fin",
         "createdAt",
         "updatedAt",
+        "imagen",
         [Sequelize.fn("COUNT", Sequelize.col("tickets.id")), "tickets_totales"],
       ],
+      where: {
+        activo: 1
+      },
       include: [
         {
           model: Tickets,

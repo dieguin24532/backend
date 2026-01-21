@@ -1,5 +1,5 @@
-import { Sequelize } from "sequelize";
-import { Pedidos, Tickets } from "../models/db/index.js";
+import { Sequelize, where } from "sequelize";
+import { Pedidos, Tickets, Eventos } from "../models/db/index.js";
 
 export class pedidoService {
 
@@ -46,7 +46,16 @@ export class pedidoService {
           model: Tickets,
           as: "tickets",
           attributes: [],
-          required: false
+          required: true,
+          include: [
+            {
+              model: Eventos,
+              as: 'evento',
+              attributes: [],
+              where: { activo: 1 },
+              required: true
+            }
+          ]
         }
       ],
       group: ["pedidos.id"],

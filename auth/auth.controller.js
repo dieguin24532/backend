@@ -12,6 +12,7 @@ import { mapearErrores } from "../helpers/errores.js";
  */
 const login = async (req, res) => {
   try {
+    console.log('Entro');
     // Validaciones de los campos
     await check("email")
       .notEmpty()
@@ -67,7 +68,7 @@ const login = async (req, res) => {
       },
     });
 
-    console.log(usuario);
+    console.log('usuario'+usuario);
 
     if (!usuario) {
       return res
@@ -77,6 +78,7 @@ const login = async (req, res) => {
 
     // Compara las credenciales
     const matchPassword = await bcrypt.compare(password, usuario.password);
+    console.log(matchPassword);
     if (email === usuario.email && matchPassword) {
     
       const token = crearToken(email, usuario.rol);
