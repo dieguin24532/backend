@@ -1,5 +1,5 @@
 import express from 'express';
-import { recibirActualizaciónPedido } from '../controllers/pedidosController.js';
+import { recibirActualizaciónPedido } from '../pedidos/pedidos.controller.js';
 
 const router = express.Router();
 

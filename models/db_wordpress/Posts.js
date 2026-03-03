@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import dbTickets from "../../config/db_wordpress.js";
+import dbTickets from "../../core/config/db_wordpress.js";
 
 const Posts = dbTickets.define('wp_posts', {
     id: {

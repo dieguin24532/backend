@@ -2,26 +2,24 @@ import 'dotenv/config';
 import path from "path";
 import { fileURLToPath } from "url";
 //Importo express
-import db from './config/db.js';
+import db from './core/config/db.js';
 import express from 'express';
 //Rutas
-import pedidosRouter from './routes/pedidosRouter.js';
-import ticketsRouter from './routes/ticketsRouter.js';
-import ordenRouter from './routes/ordenRouter.js';
-import eventosRouter from './routes/eventosRouter.js';
-import authRouter from './routes/authRouter.js';
-import usuariosRouter from './routes/usuariosRouter.js';
+import pedidosRouter from './pedidos/pedidos.routes.js';
+import ticketsRouter from './tickets/tickets.routes.js';
+import eventosRouter from './eventos/eventos.routes.js';
+import authRouter from './auth/auth.routes.js';
+import usuariosRouter from './usuarios/usuarios.routes.js';
 import sendgridRouter from './routes/sendgridRouter.js';
+import ordenRouter from './routes/ordenRouter.js';
 //Middleware
-import { verificarToken } from './middleware/auth.js';
+import { authMiddleware, requireRole } from './core/middleware/auth.middleware.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import dbTickets from "./config/db_wordpress.js";
+import dbTickets from "./core/config/db_wordpress.js";
 
 //OpenAPI
-import { swaggerSpec } from './swaggerConfig.js';
-import swaggerUi from 'swagger-ui-express';
-import { errorHandler } from "./middleware/error.middleware.js";
+import { errorHandler } from "./core/middleware/error.middleware.js";
 
 console.log({
   DB_HOST: process.env.DB_HOST,
@@ -37,6 +35,7 @@ const port = process.env.PORT || 3000;
 //Habilitar recibir peticiones HTTP con body
 const allowedOrigins = [
   'http://localhost:4200',
+  'http://localhost:9000',
   'https://ticket.galaacademy.com'
 ];
 
@@ -64,7 +63,6 @@ app.use(cors({
 app.disable('x-powered-by');
 app.use(express.json());
 app.use(cookieParser());
-console.log('hola');
 
 //Sincronizar la base de datos
 try {
@@ -87,10 +85,10 @@ try {
 app.use('/auth', authRouter);
 app.use('/orden', ordenRouter);
 app.use('/sendgrid', sendgridRouter);
-app.use('/eventos', verificarToken([1,2]), eventosRouter);
+app.use('/eventos', authMiddleware, requireRole([1, 2]), eventosRouter);
 app.use('/usuarios', usuariosRouter);
-app.use('/pedidos', verificarToken([1,2]), pedidosRouter);
-app.use('/tickets', verificarToken([1,2]), ticketsRouter);
+app.use('/pedidos', authMiddleware, requireRole([1, 2]), pedidosRouter);
+app.use('/tickets', authMiddleware, requireRole([1, 2]), ticketsRouter);
 
 // Servir la carpeta "docs" como estática
 const __filename = fileURLToPath(import.meta.url);
@@ -100,7 +98,6 @@ const __dirname = path.dirname(__filename);
 app.use("/docs", express.static(path.join(__dirname, "docs")));
 
 //Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //Middleware de errores
 app.use(errorHandler);
 // Iniciar el servidor

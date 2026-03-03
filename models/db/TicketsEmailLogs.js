@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 
-import db from "../../config/db.js";
+import db from "../../core/config/db.js";
 
 
 const TicketsEmailLogs = db.define('tickets_email_logs', {

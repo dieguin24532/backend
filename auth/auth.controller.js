@@ -1,19 +1,31 @@
-import { ApiResponse } from "../dtos/ApiResponseDTO.js";
-import { crearToken } from "../helpers/tokens.js";
-import Usuario from "../models/db/Usuarios.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { ApiResponseHelper } from "../helpers/api.response.js";
+import { AuthService } from "./auth.service.js";
 import { check, validationResult } from "express-validator";
 import { mapearErrores } from "../helpers/errores.js";
 
+// Extrae token desde cookie, header Authorization Bearer o body.token
+const getTokenFromReq = (req) => {
+  if (req.cookies?.token) return req.cookies.token;
+  const auth = req.headers.authorization || req.headers.Authorization;
+  if (auth?.toString().startsWith("Bearer ")) return auth.toString().slice(7);
+  if (req.body?.token) return req.body.token;
+  return null;
+};
+
 /**
  * Autentica al usuario mediante email y contraseña.
- * Devuelve un token JWT en una cookie si las credenciales son válidas.
+ */
+// Detecta cliente móvil
+const isMobileClient = (req) => {
+  return ((req.headers?.["x-client"] || "").toString().toLowerCase() === "mobile") ||
+         (req.body?.client || "").toString().toLowerCase() === "mobile";
+};
+
+/**
+ * Autentica al usuario mediante email y contraseña.
  */
 const login = async (req, res) => {
   try {
-    console.log('Entro');
-    // Validaciones de los campos
     await check("email")
       .notEmpty()
       .withMessage("El email es obligatorio")
@@ -24,188 +36,92 @@ const login = async (req, res) => {
     await check("password")
       .notEmpty()
       .withMessage("La contraseña es obligatoria")
-      // .isLength({ min: 8, max: 24 })
-      // .withMessage("La contraseña debe tener entre 8 y 24 caracteres")
       .run(req);
 
-      console.log(req.body);
-
     const errores = validationResult(req);
-
     if (!errores.isEmpty()) {
       const erroresMapedos = mapearErrores(errores);
-      return res
-        .status(422)
-        .json(
-          ApiResponse.getResponse(
-            422,
-            "Campos inválidos",
-            erroresMapedos
-          )
-        );
+      return res.status(422).json(ApiResponseHelper.getResponse(422, "Campos inválidos", erroresMapedos));
     }
 
-    const email = req.body.email;
-    const password = req.body.password;
+    const { email, password } = req.body;
+    const resultado = await AuthService.autenticar(email, password);
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json(
-          ApiResponse.getResponse(
-            400,
-            "Usuario y contraseña son requeridas",
-            null
-          )
-        );
+    // Cliente móvil: devuelve token en JSON
+    if (isMobileClient(req)) {
+      return res.status(200).json(ApiResponseHelper.getResponse(200, "Autenticado correctamente", resultado));
     }
 
-    const usuarios = await Usuario.findAll();
-    console.log(usuarios);
-    const usuario = await Usuario.findOne({
-      where: {
-        email: email,
-      },
-    });
-
-    console.log('usuario'+usuario);
-
-    if (!usuario) {
-      return res
-        .status(401)
-        .json(ApiResponse.getResponse(401, "Autenticación fallida", null));
-    }
-
-    // Compara las credenciales
-    const matchPassword = await bcrypt.compare(password, usuario.password);
-    console.log(matchPassword);
-    if (email === usuario.email && matchPassword) {
-    
-      const token = crearToken(email, usuario.rol);
-      
-      return res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.SECURE,
-          sameSite: "None",
-          maxAge: 1000 * 60 * 60,
-        })
-        .status(200)
-        .json(
-          ApiResponse.getResponse(200, "Autenticado correctamente", {
-            nombre: usuario.nombre,
-          })
-        );
-
-    } else {
-
-      return res
-        .status(401)
-        .json(ApiResponse.getResponse(401, "Autenticación fallida", null));
-
-    }
-  } catch (error) {
-    console.log(error);
+    // Web: cookie segura
     return res
-      .status(500)
-      .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+      .cookie("token", resultado.token, {
+        httpOnly: true,
+        secure: process.env.SECURE === "true",
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 60,
+      })
+      .status(200)
+      .json(ApiResponseHelper.getResponse(200, "Autenticado correctamente", { nombre: resultado.nombre, rol: resultado.rol }));
+
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+    const message = error.message || "Error interno del servidor";
+    console.error("Error en login:", error);
+      return res.status(statusCode).json(ApiResponseHelper.getResponse(statusCode, message, null));
   }
 };
 
 
 /**
- * Cierra la sesión del usuario eliminando la cookie de autenticación.
+ * Cierra la sesión del usuario.
  */
 const logout = async (req, res) => {
   try {
-    
+    // Web: limpiar cookie
     res.clearCookie("token", {
-      httpOnly: true,                // Solo accesible desde el servidor
-      secure: process.env.SECURE,   // Solo se envía por HTTPS si está activado
-      sameSite: "None",             // Permitir envío entre sitios (necesario si frontend y backend están en dominios distintos)
+      httpOnly: true,
+      secure: process.env.SECURE === "true",
+      sameSite: "Strict",
     });
 
-    res.status(200).json(ApiResponse.getResponse(200, "Logout exitoso", null));
-
+    res.status(200).json(ApiResponseHelper.getResponse(200, "Logout exitoso", null));
   } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+    console.error("Error en logout:", error);
+    return res.status(500).json(ApiResponseHelper.getResponse(500, "Error interno del servidor", null));
   }
 };
 
 
 /**
- * Verifica si el token JWT es válido y el usuario existe.
+ * Verifica si el token JWT es válido.
  */
 const isAuth = async (req, res) => {
   try {
+    const token = getTokenFromReq(req);
+    const usuario = await AuthService.verificarToken(token);
 
-    const token = req.cookies.token;
-
-    if (!token) {
-      return res
-        .status(401)
-        .json(ApiResponse.getResponse(401, "Token no existe", false));
-    }
-
-    const payload = jwt.verify(token, process.env.JWT_KEY);
-    const usuarioEncontrado = await Usuario.findOne({
-      where: { email: payload.usuario },
-    });
-
-
-    if (!usuarioEncontrado) {
-      return res
-        .status(403)
-        .json(ApiResponse.getResponse(403, "Token inválido", false));
-    }
-
-    res.status(200).json(ApiResponse.getResponse(200, "Token válido", true));
-
+    return res.status(200).json(ApiResponseHelper.getResponse(200, "Token válido", true));
   } catch (error) {
-
-    console.log(error);
-    res.status(500).json(ApiResponse.getResponse(500, "Error al verificar el token", false));
+    const statusCode = error.statusCode || 500;
+    console.error("Error en isAuth:", error);
+    return res.status(statusCode).json(ApiResponseHelper.getResponse(statusCode, error.message, false));
   }
 };
 
 
 /**
- * Devuelve el rol del usuario autenticado si el token es válido.
+ * Devuelve el rol del usuario autenticado.
  */
 const getRoleLoginUser = async (req, res) => {
   try {
-    // Obtener el token desde las cookies
-    const token = req.cookies.token;
+    const token = getTokenFromReq(req);
+    const rol = await AuthService.obtenerRolDelToken(token);
 
-    // Si no hay token, el usuario no está autenticado
-    if (!token) {
-      return res
-        .status(401)
-        .json(ApiResponse.getResponse(401, "Token no proporcionado", false));
-    }
-
-    const payload = jwt.verify(token, process.env.JWT_KEY);
-
-    const usuarioEncontrado = await Usuario.findOne({
-      where: { email: payload.usuario },
-    });
-
-    if (!usuarioEncontrado) {
-      return res
-        .status(403)
-        .json(ApiResponse.getResponse(403, "Token inválido: Usuario no encontrado", false));
-    }
-
-    res
-      .status(200)
-      .json(ApiResponse.getResponse(200, "Token válido", usuarioEncontrado.rol));
-
+    return res.status(200).json(ApiResponseHelper.getResponse(200, "Rol obtenido", rol));
   } catch (error) {
-    console.log(error);
-    res.status(500).json(ApiResponse.getResponse(500, "Error al verificar token", false));
+    const statusCode = error.statusCode || 500;
+    console.error("Error en getRoleLoginUser:", error);
+    return res.status(statusCode).json(ApiResponseHelper.getResponse(statusCode, error.message, false));
   }
 };
 

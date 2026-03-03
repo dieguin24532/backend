@@ -1,6 +1,6 @@
 import express from 'express';
-import { enviarEntrada, obtenerTicketsByEvento, obtenerTickets, verEntrada, validarEntrada } from '../controllers/ticketsController.js';
-import { obtenerLogsByTicketID } from '../controllers/ticketsMailLogsController.js';
+import { enviarEntrada, obtenerTicketsByEvento, obtenerTickets, verEntrada } from './tickets.controller.js';
+import { obtenerLogsByTicketID } from './ticketsMailLogsController.js';
 
 const router = express.Router();
 
@@ -11,6 +11,5 @@ router.get('/ver-entrada/:id', verEntrada);
 router.get('/email-logs/:id', obtenerLogsByTicketID)
 
 router.post('/enviar-entrada/:id', enviarEntrada);
-router.post('/validar-entrada/', validarEntrada);
 
 export default router;

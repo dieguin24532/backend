@@ -1,5 +1,11 @@
 
 const ApiResponseHelper = {
+    getResponse: (codigo, mensaje = "Operación exitosa", datos = null) => ({
+        status: codigo,
+        message: mensaje,
+        data: datos
+    }),
+
     success: ( estado, mensaje = "Operacion exitosa", datos) => ({
         succes: true,
         estado: estado,

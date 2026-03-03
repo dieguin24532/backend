@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts } from "pdf-lib";
-import { ticketService } from "../serviceLayer/ticketsService.js";
+import { ticketService } from "../tickets.service.js";
 
 /**
  * Genera el archivo PDF de un ticket que se recibe como parámetro

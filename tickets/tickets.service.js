@@ -53,6 +53,8 @@ export class ticketService {
         "localidad_id",
         "correo_enviado",
         "escaneado_por",
+        "escaneado",
+        "fecha_escaneo",
         [Sequelize.col("evento.nombre_evento"), "nombre_evento"],
         [Sequelize.col("pedido.cliente"), "cliente"],
         [Sequelize.col("localidad.nombre"), "nombre_localidad"],

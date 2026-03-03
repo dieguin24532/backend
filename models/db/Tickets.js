@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import db from "../../config/db.js";
+import db from "../../core/config/db.js";
 import { v4 as uuidv4 } from "uuid";
 
 const Tickets = db.define("tickets", {
@@ -41,6 +41,14 @@ const Tickets = db.define("tickets", {
   correo_enviado: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  escaneado: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  fecha_escaneo: {
+    type: DataTypes.DATE,
+    allowNull: true
   },
   escaneado_por: {
     type: DataTypes.STRING,

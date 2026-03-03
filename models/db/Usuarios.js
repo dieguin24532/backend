@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { v4 as uiidv4 } from "uuid";
-import db from "../../config/db.js";
+import db from "../../core/config/db.js";
 import bcrypt from "bcrypt";
 
 const Usuario = db.define('usuarios', {

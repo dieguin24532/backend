@@ -1,5 +1,5 @@
 import express from 'express';
-import { almacenarLogs } from '../controllers/ticketsMailLogsController.js';
+import { almacenarLogs } from '../tickets/ticketsMailLogsController.js';
 
 const router = express.Router();
 

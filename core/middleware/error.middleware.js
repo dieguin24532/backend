@@ -1,4 +1,4 @@
-import { ApiResponseHelper } from "../helpers/apiResponse.js";
+import { ApiResponseHelper } from "../../helpers/api.response.js";
 
 const errorHandler = (err, req, res, next) => {
     const estado = err.status || 500;

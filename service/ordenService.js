@@ -1,9 +1,9 @@
-import db from "../config/db.js";
-import { eventoService } from "./eventosService.js";
-import { ticketService } from "./ticketsService.js";
-import { pedidoService } from "./pedidosService.js";
+import db from "../core/config/db.js";
+import { eventoService } from "../eventos/eventos.service.js";
+import { ticketService } from "../tickets/tickets.service.js";
+import { pedidoService } from "../pedidos/pedidosService.js";
 import { localidadService } from "./localidadesService.js";
-import { generarCodigoQR } from "../helpers/codigosQr.js";
+import { generarCodigoQR } from "../tickets/helpers/codigosQr.js";
 import { buscarMetaKey } from "../helpers/utils.js";
 
 export class ordenService {

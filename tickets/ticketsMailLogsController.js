@@ -1,5 +1,5 @@
 import { TicketsEmailLogs } from "../models/db/index.js";
-import { ApiResponse } from "../dtos/ApiResponseDTO.js";
+import { ApiResponseHelper } from "../helpers/api.response.js";
 
 /**
  * Almacena un log de eventos de email recibido desde un webhook
@@ -33,15 +33,15 @@ async function almacenarLogs(req, res) {
 
     if(created) {
         console.log('Insertado correctamente');
-        res.status(200).json(ApiResponse.getResponse(200, 'Insertado correctamente', ticketLog))
+        res.status(200).json(ApiResponseHelper.getResponse(200, 'Insertado correctamente', ticketLog))
     } else {
         console.log('Registro ya existe');
-        res.status(200).json(ApiResponse.getResponse(200, 'Registro ya existe', ticketLog))
+        res.status(200).json(ApiResponseHelper.getResponse(200, 'Registro ya existe', ticketLog))
     }
 
   } catch (error) {
     console.log(error);
-    res.status(500).json(ApiResponse.getResponse(500, 'Error interno en el servidor', null))
+    res.status(500).json(ApiResponseHelper.getResponse(500, 'Error interno en el servidor', null))
   }
 }
 
@@ -62,11 +62,11 @@ async function obtenerLogsByTicketID(req, res) {
      }
     })
  
-    res.status(200).json(ApiResponse.getResponse(200, 'Logs obtenidos', emailLogs))
+    res.status(200).json(ApiResponseHelper.getResponse(200, 'Logs obtenidos', emailLogs))
     
   } catch (error) {
     console.log(error);
-    res.status(500).json(ApiResponse.getResponse(500, 'Erro interno en el servidor', null))
+    res.status(500).json(ApiResponseHelper.getResponse(500, 'Erro interno en el servidor', null))
   }
 }
 

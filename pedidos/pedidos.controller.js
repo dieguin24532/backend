@@ -1,7 +1,7 @@
-import { ApiResponse } from "../dtos/ApiResponseDTO.js";
+import { ApiResponseHelper } from "../helpers/api.response.js";
 import Pedidos from "../models/db/Pedidos.js";
-import { ordenService } from "../serviceLayer/ordenService.js";
-import { pedidoService } from "../serviceLayer/pedidosService.js";
+import { ordenService } from "../service/ordenService.js";
+import { pedidoService } from "./pedidosService.js";
 
 /**
  * Procesa la actualización de un pedido desde una fuente externa (e.g. WooCommerce).
@@ -36,7 +36,7 @@ async function recibirActualizaciónPedido(req, res) {
       return res
         .status(200)
         .json(
-          ApiResponse.getResponse(200, "Pedido ingresado correctamente", pedido)
+          ApiResponseHelper.getResponse(200, "Pedido ingresado correctamente", pedido)
         );
     } else {
       // Elimina la orden si el pedido fue cancelado u otro estado
@@ -45,14 +45,14 @@ async function recibirActualizaciónPedido(req, res) {
       return res
         .status(200)
         .json(
-          ApiResponse.getResponse(200, "Pedido eliminado correctamente", pedido)
+          ApiResponseHelper.getResponse(200, "Pedido eliminado correctamente", pedido)
         );
     }
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+      .json(ApiResponseHelper.getResponse(500, "Error interno del servidor", null));
   }
 }
 
@@ -67,14 +67,14 @@ async function obtenerPedidos(req, res) {
     const pedidos = await pedidoService.obtenerPedidos();
 
     if(pedidos.length === 0) {
-      return res.status(200).json(ApiResponse.getResponse(200, 'No se encontraron pedidos' ,pedidos));
+      return res.status(200).json(ApiResponseHelper.getResponse(200, 'No se encontraron pedidos' ,pedidos));
     }
-    res.status(200).json(ApiResponse.getResponse(200, 'Pedidos obtenidos' ,pedidos));
+    res.status(200).json(ApiResponseHelper.getResponse(200, 'Pedidos obtenidos' ,pedidos));
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+      .json(ApiResponseHelper.getResponse(500, "Error interno del servidor", null));
   }
 }
 
@@ -93,7 +93,7 @@ async function actualizarEmail(req, res) {
       }
     );
 
-    res.status(200).json(ApiResponse.getResponse(200, 'Actualizado correctamente', updatedRows))
+    res.status(200).json(ApiResponseHelper.getResponse(200, 'Actualizado correctamente', updatedRows))
   } catch (error) {
     console.log(error);
   }

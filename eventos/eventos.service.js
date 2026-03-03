@@ -2,7 +2,7 @@ import { Eventos, Localidades, Tickets } from "../models/db/index.js";
 import PostsMeta from "../models/db_wordpress/Post-meta.js";
 import Posts from "../models/db_wordpress/Posts.js";
 import { Op, Sequelize, where } from "sequelize";
-import { ticketService } from "./ticketsService.js";
+import { ticketService } from "../tickets/tickets.service.js";
 import { buscarMetaKey } from "../helpers/utils.js";
 
 export class eventoService {
