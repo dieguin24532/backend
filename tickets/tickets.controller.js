@@ -59,12 +59,12 @@ async function obtenerTicketsByEvento(req, res) {
         }
 
         res.status(200)
-            .json(ApiResponse.getResponse(200, "No existen tickets", tickets));
+            .json(ApiResponseHelper.getResponse(200, "No existen tickets", tickets));
 
     } catch (error) {
         console.log(error);
         res.status(500)
-            .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+            .json(ApiResponseHelper.getResponse(500, "Error interno del servidor", null));
     }
 }
 
@@ -87,7 +87,7 @@ async function verEntrada(req, res) {
         console.error(error);
         res
             .status(500)
-            .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+            .json(ApiResponseHelper.getResponse(500, "Error interno del servidor", null));
     }
 }
 
@@ -102,12 +102,12 @@ async function enviarEntrada(req, res) {
         const PDF = await generarEntradaPDF(ticketId);
         await enviarEmail(PDF, ticket);
         await ticketService.actualizarTicket({ id: ticketId, correo_enviado: true }, null);
-        res.status(200).json(ApiResponse.getResponse(200, "Correo enviado correctamente", null))
+        res.status(200).json(ApiResponseHelper.getResponse(200, "Correo enviado correctamente", null))
     } catch (error) {
         console.log(error);
         res
             .status(500)
-            .json(ApiResponse.getResponse(500, "Error interno del servidor", null));
+            .json(ApiResponseHelper.getResponse(500, "Error interno del servidor", null));
     }
 }
 
